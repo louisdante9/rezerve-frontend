@@ -9,25 +9,23 @@ import {
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
 
-const CustomerListToolbar = (props) => (
-  <Box {...props}>
+const CustomerListToolbar = ({setuserfilter, ...rest}) => {
+  return (
+  <Box {...rest}>
     <Box
       sx={{
         display: 'flex',
         justifyContent: 'flex-end'
       }}
     >
-      <Button>
-        Import
+      <Button onClick={()=> setuserfilter('admin')}>
+        Admins
       </Button>
-      <Button sx={{ mx: 1 }}>
-        Export
+      <Button sx={{ mx: 1 }} onClick={()=> setuserfilter('agent')}>
+        Agents
       </Button>
-      <Button
-        color="primary"
-        variant="contained"
-      >
-        Add customer
+      <Button onClick={()=> setuserfilter('user')}>
+        Users
       </Button>
     </Box>
     <Box sx={{ mt: 3 }}>
@@ -56,6 +54,6 @@ const CustomerListToolbar = (props) => (
       </Card>
     </Box>
   </Box>
-);
+)};
 
 export default CustomerListToolbar;

@@ -21,11 +21,12 @@ import {
   UPDATE_TRANS_ERROR,
   GET_USERS_SUCCESS,
   GET_USERS_ERROR,
+  UPDATE_USER_SUCCESS,
   UPDATE_USER_ERROR
 } from './constants';
 
 // const API = 'https://creditdeliveries.herokuapp.com';
-const API = 'http://localhost:9000/v1';
+const API = 'http://localhost:9000';
 
 /**
  *
@@ -51,11 +52,10 @@ export function setCurrentUser(user) {
 const LoginError = data => ({ type: USER_LOGIN_ERRORS, payload: data });
 
 export function SigninRequest(userData, history) {
-  return dispatch => axios.post(`${API}/users/login`, userData)
+  return dispatch => axios.post(`${API}/login`, userData)
     .then(res => {
       const token = registerToken(res.data);
       dispatch(setCurrentUser(decode(token)));
-      // return decode(token)
       history.push('/dashboard');
       dispatch(LoginError({}));
     }).catch(err => {
@@ -147,7 +147,7 @@ const fetchAUserError = data =>
   ({ type: GET_USER_ERROR, payload: data });
 
 export const fetchAUserDetails = id => dispatch => {
-  axios.get(`${API}/users/${id}`)
+  axios.get(`${API}/user/get-user/${id}`)
     .then((response) => {
       dispatch(fetchAUserSuccess(response.data.user));
     })
@@ -215,12 +215,13 @@ export const fetchTrans = id => dispatch => {
  */
 const adminLoginError = data => ({ type: ADMIN_LOGIN_ERRORS, payload: data });
 
-export const adminLogin = (user, history) => dispatch => {
-  axios.post(`${API}/admin/login`, user)
+export const adminLogin = (userData, navigate) => dispatch => {
+  axios.post(`${API}/user/admin/login`, userData)
     .then(res => {
+      console.log(res, 'res data')
       const token = registerToken(res.data);
       dispatch(setCurrentUser(decode(token)));
-      history.push('/users')
+      navigate('/', { replace: true });
     })
     .catch(err => {
       dispatch(adminLoginError(err.response.data));
@@ -297,24 +298,23 @@ export const updateTransaction = (id, transObj) => dispatch => {
 
 
 /**
- *
  * @desc this function returns a users details
  * @param {any} token
  * @returns {void}
  */
-const fetchAUsersSuccess = user =>
+const fetchUsersSuccess = user =>
   ({ type: GET_USERS_SUCCESS, payload: user });
 
-const fetchAUsersError = data =>
+const fetchUsersError = data =>
   ({ type: GET_USERS_ERROR, payload: data });
 
 export const fetchUsers = () => dispatch => {
-  axios.get(`${API}/admin/users`)
+  axios.get(`${API}/user/admin/get-users`)
     .then((response) => {
-      dispatch(fetchAUsersSuccess(response.data.clients));
+      dispatch(fetchUsersSuccess(response.data.clients));
     })
     .catch((error) => {
-      dispatch(fetchAUsersError(error.response.data));
+      dispatch(fetchUsersError(error.response));
     });
 }
 
@@ -323,27 +323,23 @@ export const fetchUsers = () => dispatch => {
   /**
      * @function updateUser
      * @param { string } id
-     * @param { string } accountBal
+     * @param { string } userObj
      * @param { object } history
      * @returns {object} dispatches an action
-     * @description updates a user
-     * 
-     * @function updateAParcelFailed
-     * @param { object } Id
-     * @returns {object} dispatches an action
-     * @description pure function redux action
      */
       
-  const updateAParcelFailed = data =>
-    ({ type: UPDATE_USER_ERROR, data });
 
-  export function updateUser (id, obj, history) { 
-    return dispatch =>
-    axios.put(`${API}/admin/users/${id}`, obj)
-      .then(() => history.push('/users'))
-      .catch((error) => {
-        dispatch(updateAParcelFailed(error.response.data));
-      });
+  const updateUserSuccess = data =>
+    ({ type: UPDATE_USER_SUCCESS, payload: data });
+
+  export function updateUser (id, obj) { 
+    return dispatch => {
+      return axios.put(`${API}/user/${id}`, obj)
+        .then((res) => {
+          dispatch(updateUserSuccess(res.data.updatedUser));
+          return res
+        })
+      }
     }
 
 /**

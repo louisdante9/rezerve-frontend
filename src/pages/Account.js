@@ -1,16 +1,30 @@
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet';
 import {
   Box,
   Container,
   Grid
 } from '@material-ui/core';
-import AccountProfile from 'src/components/account/AccountProfile';
+// import AccountProfile from 'src/components/account/AccountProfile';
 import AccountProfileDetails from 'src/components/account/AccountProfileDetails';
+import { fetchAUserDetails } from '../actions'
 
-const Account = () => (
+
+const Account = () => {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  useEffect(()=> {
+    dispatch(fetchAUserDetails(id))
+  }, [dispatch, id]);
+  
+  const { getUser: user}  = useSelector((state)=> state)
+
+  return (
   <>
     <Helmet>
-      <title>Account | Material Kit</title>
+      <title>Account | Rezerve Homes</title>
     </Helmet>
     <Box
       sx={{
@@ -24,26 +38,26 @@ const Account = () => (
           container
           spacing={3}
         >
-          <Grid
+          {/* <Grid
             item
             lg={4}
             md={6}
             xs={12}
           >
             <AccountProfile />
-          </Grid>
+          </Grid> */}
           <Grid
             item
-            lg={8}
-            md={6}
+            lg={12}
+            md={12}
             xs={12}
           >
-            <AccountProfileDetails />
+            <AccountProfileDetails user={user}/>
           </Grid>
         </Grid>
       </Container>
     </Box>
   </>
-);
+)};
 
 export default Account;
