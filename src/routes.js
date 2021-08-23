@@ -10,12 +10,13 @@ import ProductList from 'src/pages/ProductList';
 import Register from 'src/pages/Register';
 import Settings from 'src/pages/Settings';
 
-const routes = [
+
+const routes = (isSignedIn) => [
   {
     path: 'app',
-    element: <DashboardLayout />,
+    element: isSignedIn ? <DashboardLayout /> : <Navigate to="/login" />,
     children: [
-      { path: 'account', element: <Account /> },
+      { path: 'account/:id', element: <Account /> },
       { path: 'customers', element: <CustomerList /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'products', element: <ProductList /> },
@@ -25,9 +26,10 @@ const routes = [
   },
   {
     path: '/',
-    element: <MainLayout />,
+    element: !isSignedIn ? <MainLayout /> : <Navigate to="/app/dashboard" />,
     children: [
       { path: 'login', element: <Login /> },
+      { path: 'admin/login', element: <Login /> },
       { path: 'register', element: <Register /> },
       { path: '404', element: <NotFound /> },
       { path: '/', element: <Navigate to="/app/dashboard" /> },

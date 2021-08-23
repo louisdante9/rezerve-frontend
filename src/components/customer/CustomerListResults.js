@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
@@ -17,7 +18,8 @@ import {
 } from '@material-ui/core';
 import getInitials from 'src/utils/getInitials';
 
-const CustomerListResults = ({ customers, ...rest }) => {
+const CustomerListResults = ({ customers, userFilter, ...rest }) => {
+  const navigate = useNavigate();
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
@@ -53,7 +55,9 @@ const CustomerListResults = ({ customers, ...rest }) => {
 
     setSelectedCustomerIds(newSelectedCustomerIds);
   };
-
+  const handleRouting = (id) => {
+    navigate(`/app/account/${id}`, { replace: true });
+  }
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
@@ -87,7 +91,7 @@ const CustomerListResults = ({ customers, ...rest }) => {
                   Email
                 </TableCell>
                 <TableCell>
-                  Location
+                  Activation Code
                 </TableCell>
                 <TableCell>
                   Phone
@@ -98,54 +102,60 @@ const CustomerListResults = ({ customers, ...rest }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers.slice(0, limit).map((customer) => (
-                <TableRow
-                  hover
-                  key={customer.id}
-                  selected={selectedCustomerIds.indexOf(customer.id) !== -1}
-                >
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedCustomerIds.indexOf(customer.id) !== -1}
-                      onChange={(event) => handleSelectOne(event, customer.id)}
-                      value="true"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        alignItems: 'center',
-                        display: 'flex'
-                      }}
+              {customers
+                .filter((client) => client.role === userFilter)
+                .slice(0, limit).map((customer) => (
+                  <TableRow
+                      hover
+                      key={customer._id}
+                      selected={selectedCustomerIds.indexOf(customer._id) !== -1}
+                      onClick={()=> handleRouting(customer._id)}
+                      style={{ cursor: 'pointer' }}
                     >
-                      <Avatar
-                        src={customer.avatarUrl}
-                        sx={{ mr: 2 }}
-                      >
-                        {getInitials(customer.name)}
-                      </Avatar>
-                      <Typography
-                        color="textPrimary"
-                        variant="body1"
-                      >
-                        {customer.name}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    {customer.email}
-                  </TableCell>
-                  <TableCell>
-                    {`${customer.address.city}, ${customer.address.state}, ${customer.address.country}`}
-                  </TableCell>
-                  <TableCell>
-                    {customer.phone}
-                  </TableCell>
-                  <TableCell>
-                    {moment(customer.createdAt).format('DD/MM/YYYY')}
-                  </TableCell>
-                </TableRow>
-              ))}
+                  {/* <RouterLink to={`/account/${customer._id}`} > */}
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedCustomerIds.indexOf(customer._id) !== -1}
+                          onChange={(event) => handleSelectOne(event, customer._id)}
+                          value="true"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          sx={{
+                            alignItems: 'center',
+                            display: 'flex'
+                          }}
+                        >
+                          <Avatar
+                            src={customer.avatarUrl}
+                            sx={{ mr: 2 }}
+                          >
+                            {getInitials(`${customer.firstname} ${customer.lastname} `)}
+                          </Avatar>
+                          <Typography
+                            color="textPrimary"
+                            variant="body1"
+                          >
+                            {`${customer.firstname} ${customer.lastname} `}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        {customer.email}
+                      </TableCell>
+                      <TableCell>
+                        {`${customer.activationCode}`}
+                      </TableCell>
+                      <TableCell>
+                        {customer.phone || '-'}
+                      </TableCell>
+                      <TableCell>
+                        {moment(customer.createdAt).format('DD/MM/YYYY')}
+                      </TableCell>
+                  {/* </RouterLink> */}
+                    </TableRow>
+                ))}
             </TableBody>
           </Table>
         </Box>
