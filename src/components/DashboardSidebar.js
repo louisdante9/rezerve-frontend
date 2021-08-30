@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -23,10 +24,8 @@ import {
 } from 'react-feather';
 import NavItem from './NavItem';
 
-const user = {
+const userF = {
   avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Senior Developer',
-  name: 'Katarina Smith'
 };
 
 const items = [
@@ -41,7 +40,7 @@ const items = [
     title: 'Customers'
   },
   {
-    href: '/app/products',
+    href: '/app/apartments',
     icon: ShoppingBagIcon,
     title: 'Apartments'
   },
@@ -55,25 +54,27 @@ const items = [
     icon: SettingsIcon,
     title: 'Settings'
   },
-  {
-    href: '/login',
-    icon: LockIcon,
-    title: 'Login'
-  },
-  {
-    href: '/register',
-    icon: UserPlusIcon,
-    title: 'Register'
-  },
-  {
-    href: '/404',
-    icon: AlertCircleIcon,
-    title: 'Error'
-  }
+  // {
+  //   href: '/login',
+  //   icon: LockIcon,
+  //   title: 'Login'
+  // },
+  // {
+  //   href: '/register',
+  //   icon: UserPlusIcon,
+  //   title: 'Register'
+  // },
+  // {
+  //   href: '/404',
+  //   icon: AlertCircleIcon,
+  //   title: 'Error'
+  // }
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
   const location = useLocation();
+  const {user} = useSelector(state=> state.setCurrentUser)
+
 
   useEffect(() => {
     if (openMobile && onMobileClose) {
@@ -99,7 +100,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
       >
         <Avatar
           component={RouterLink}
-          src={user.avatar}
+          src={userF.avatar}
           sx={{
             cursor: 'pointer',
             width: 64,
@@ -111,13 +112,13 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           color="textPrimary"
           variant="h5"
         >
-          {user.name}
+        {`${user.firstname} ${user.lastname}`}
         </Typography>
         <Typography
           color="textSecondary"
           variant="body2"
         >
-          {user.jobTitle}
+          Email: {user.email}
         </Typography>
       </Box>
       <Divider />

@@ -1,5 +1,7 @@
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
+import { property } from 'lodash';
+import Apartmemt from 'src/pages/Apartment';
 import swal from 'sweetalert';
 import setAuthToken from '../utils/SetAuthToken';
 import {
@@ -11,18 +13,16 @@ import {
   ACTIVATE_SUCCESS,
   GET_USER_SUCCESS,
   GET_USER_ERROR,
-  BUY_MINING_SUCCESS,
-  BUY_MINING_ERROR,
-  GET_USER_TRANS_SUCCESS,
-  GET_USER_TRANS_ERROR,
-  GET_ADMIN_TRANS_SUCCESS,
-  GET_ADMIN_TRANS_ERROR,
-  UPDATE_TRANS_SUCCESS,
-  UPDATE_TRANS_ERROR,
+  GET_APARTMENT_SUCCESS,
+  GET_APARTMENT_ERROR,
+  GET_APARTMENTS_SUCCESS,
+  GET_APARTMENTS_ERROR,
+  CREATE_APARTMENT_SUCCESS,
+  UPDATE_PROPERTY_SUCCESS,
+  DELETE_PROPERTY_SUCCESS,
   GET_USERS_SUCCESS,
   GET_USERS_ERROR,
   UPDATE_USER_SUCCESS,
-  UPDATE_USER_ERROR
 } from './constants';
 
 // const API = 'https://creditdeliveries.herokuapp.com';
@@ -88,7 +88,8 @@ function registerToken({ token }) {
 
 export const registerUser = (user, history) => dispatch => {
   axios.post(`${API}/users/register`, user)
-    .then(res => history.push('/verifyToken'))
+    .then(res => {
+      history.push('/verifyToken')})
     .catch(err => {
       dispatch({
         type: USER_SIGNUP_ERRORS,
@@ -159,25 +160,24 @@ export const fetchAUserDetails = id => dispatch => {
 /**
  * 
  * 
- * @desc this method handles buying minings for the user
+ * @desc getApartment
  * @returns {void}
  */
-const MiningsSuccess = transaction =>
-  ({ type: BUY_MINING_SUCCESS, payload: transaction });
+const getApartmentSuccess = apartment =>
+  ({ type: GET_APARTMENT_SUCCESS, payload: apartment });
 
-const MiningsError = data =>
-  ({ type: BUY_MINING_ERROR, payload: data });
+const getApartmentError = data =>
+  ({ type: GET_APARTMENT_ERROR, payload: data });
 
 
-export function buyMinings(obj, history) {
+export function getApartment(id) {
   return dispatch =>
-    axios.post(`${API}/users/transaction`, obj)
+    axios.get(`${API}/apartment/${id}`)
       .then((response) => {
-        dispatch(MiningsSuccess(response.data.transaction));
-        history.push('/transactions')
+        dispatch(getApartmentSuccess(response.data.data));
       })
       .catch((error) => {
-        dispatch(MiningsError(error.response.data));
+        dispatch(getApartmentError(error.response.data));
       });
 }
 
@@ -188,19 +188,20 @@ export function buyMinings(obj, history) {
  * @param {any} token
  * @returns {void}
  */
-const fetchTransSuccess = transactions =>
-  ({ type: GET_USER_TRANS_SUCCESS, payload: transactions });
+const getApartmentsSuccess = transactions =>
+  ({ type: GET_APARTMENTS_SUCCESS, payload: transactions });
 
-const fetchTransError = data =>
-  ({ type: GET_USER_TRANS_ERROR, payload: data });
+const getApartmentsError = data =>
+  ({ type: GET_APARTMENTS_ERROR, payload: data });
 
-export const fetchTrans = id => dispatch => {
-  axios.get(`${API}/users/${id}/transaction`)
+export const getApartments = () => dispatch => {
+  axios.get(`${API}/apartment`)
     .then((response) => {
-      dispatch(fetchTransSuccess(response.data.transactions));
+      dispatch(getApartmentsSuccess(response.data.apartments));
     })
     .catch((error) => {
-      dispatch(fetchTransError(error.response.data));
+      console.log(error)
+      dispatch(getApartmentsError(error.response.data));
     });
 }
 
@@ -218,7 +219,6 @@ const adminLoginError = data => ({ type: ADMIN_LOGIN_ERRORS, payload: data });
 export const adminLogin = (userData, navigate) => dispatch => {
   axios.post(`${API}/user/admin/login`, userData)
     .then(res => {
-      console.log(res, 'res data')
       const token = registerToken(res.data);
       dispatch(setCurrentUser(decode(token)));
       navigate('/', { replace: true });
@@ -251,48 +251,54 @@ export const registerAdmin = (admin, history) => dispatch => {
 
 /**
  *
- * @desc this function returns list of transactions
+ * @desc createProperty
  * @param {any} tokenGET_ADMIN_TRANS_SUCCESS
  * @returns {void}
  */
-const fetchAdminTransSuccess = transactions =>
-  ({ type: GET_ADMIN_TRANS_SUCCESS, payload: transactions });
 
-const fetchAdminTransError = data =>
-  ({ type: GET_ADMIN_TRANS_ERROR, payload: data });
 
-export const fetchAdminTrans = () => dispatch => {
-  axios.get(`${API}/admin/transactions`)
-    .then((response) => {
-      dispatch(fetchAdminTransSuccess(response.data.transactions));
+export const createProperty = (propertyData) => dispatch => {
+  return axios.post(`${API}/apartment`, propertyData)
+    .then(({data}) => {
+      dispatch({ type: CREATE_APARTMENT_SUCCESS, payload: data.apartmemt });
+      return data;
     })
-    .catch((error) => {
-      dispatch(fetchAdminTransError(error.response.data));
-    });
+   
 }
 
 
 
 /**
  *
+ * @desc updateProperty
+ * @param {any} token
+ * @returns {void}
+ */
+const updatePropertySuccess = property =>
+  ({ type: UPDATE_PROPERTY_SUCCESS, payload: property });
+
+export const updateProperty = (id, propertyObj) => dispatch => {
+  return axios.put(`${API}/apartment/${id}/`, propertyObj)
+    .then((response) => {
+      dispatch(updatePropertySuccess(response.data.updatedApartment));
+      return response.data.updatedApartment
+    })
+}
+/**
+ *
  * @desc this function returns list of transactions
  * @param {any} token
  * @returns {void}
  */
-const updateTransactionSuccess = transaction =>
-  ({ type: UPDATE_TRANS_SUCCESS, payload: transaction });
 
-const updateTransactionError = data =>
-  ({ type: UPDATE_TRANS_ERROR, payload: data });
 
-export const updateTransaction = (id, transObj) => dispatch => {
-  axios.post(`${API}/admin/transactions/${id}/`, transObj)
+export const deleteProperty = (id) => dispatch => {
+  return axios.delete(`${API}/apartment/${id}/`)
+
     .then((response) => {
-      dispatch(updateTransactionSuccess(response.data.updateTransaction));
+      dispatch(updatePropertySuccess({ type: DELETE_PROPERTY_SUCCESS, payload: response.data.delApartment }));
+      return response.data.delApartment
     })
-    .catch((error) => {
-      dispatch(updateTransactionError(error.response.data));
-    });
 }
 
 

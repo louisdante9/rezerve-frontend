@@ -14,7 +14,7 @@ const CustomerList = () => {
     dispatch(fetchUsers())
   }, []);
   const { users } = useSelector((state)=> state.getUsers)
-  const [userFilter, setUserFilter] = useState('user')
+  const [userFilter, setUserFilter] = useState('user');
 
   return (
   <>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
@@ -18,7 +18,7 @@ import {
 } from '@material-ui/core';
 import getInitials from 'src/utils/getInitials';
 
-const CustomerListResults = ({ customers, userFilter, ...rest }) => {
+const CustomerListResults = ({ customers, userFilter, history, ...rest }) => {
   const navigate = useNavigate();
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [limit, setLimit] = useState(10);
@@ -56,7 +56,7 @@ const CustomerListResults = ({ customers, userFilter, ...rest }) => {
     setSelectedCustomerIds(newSelectedCustomerIds);
   };
   const handleRouting = (id) => {
-    navigate(`/app/account/${id}`, { replace: true });
+    navigate(`/app/account/${id}`);
   }
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -105,6 +105,7 @@ const CustomerListResults = ({ customers, userFilter, ...rest }) => {
               {customers
                 .filter((client) => client.role === userFilter)
                 .slice(0, limit).map((customer) => (
+                  // <RouterLink to={`/app/account/${customer._id}`} > 
                   <TableRow
                       hover
                       key={customer._id}
@@ -112,7 +113,6 @@ const CustomerListResults = ({ customers, userFilter, ...rest }) => {
                       onClick={()=> handleRouting(customer._id)}
                       style={{ cursor: 'pointer' }}
                     >
-                  {/* <RouterLink to={`/account/${customer._id}`} > */}
                       <TableCell padding="checkbox">
                         <Checkbox
                           checked={selectedCustomerIds.indexOf(customer._id) !== -1}
@@ -153,8 +153,8 @@ const CustomerListResults = ({ customers, userFilter, ...rest }) => {
                       <TableCell>
                         {moment(customer.createdAt).format('DD/MM/YYYY')}
                       </TableCell>
-                  {/* </RouterLink> */}
                     </TableRow>
+                  // </RouterLink>
                 ))}
             </TableBody>
           </Table>
