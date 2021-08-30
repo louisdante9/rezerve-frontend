@@ -322,7 +322,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
             >
               <TextField
                 fullWidth
-                label="zip Code"
+                label="Zip Code"
                 name="zipCode"
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -337,28 +337,26 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               md={6}
               xs={12}
             >
-              <FormControl variant="outlined" required fullWidth>
+              <FormControl variant="outlined"
+               fullWidth
+               required
+              >
                 <InputLabel id="state">State</InputLabel>
-                <Select
-                  labelId="state"
-                  id="demo-simple-select-outlined"
-                  value={values.state || ''}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  label="State"
-                  error={Boolean(touched.state && errors.state)}
-                  disabled={!dropdownlist.length}
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {dropdownlist.map((item)=> <MenuItem key={item} value={item}>
+              <Select
+             
+        id="state"
+        label= "State"
+        value={values.state}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        name="state"
+        disabled={!dropdownlist.length}>
+          
+          {dropdownlist.map((item)=> <option key={item} value={item}>
           {item}
-          </MenuItem>)}
-                </Select>
-              </FormControl>
-
-
+          </option>)}
+      </Select>
+      </FormControl>
             </Grid>
             <Grid
               item
