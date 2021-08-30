@@ -15,11 +15,19 @@ import {
   Divider,
   Grid,
   TextField,
-  Typography
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom'
 import { updateProperty, deleteProperty, createProperty } from '../../actions'
-import {thumbsContainer, thumb, thumbInner, img, baseStyle, activeStyle, acceptStyle, rejectStyle } from './styles'
+import { thumbsContainer, thumb, thumbInner, img, baseStyle, activeStyle, acceptStyle, rejectStyle } from './styles'
+
+
+const dropdownlist = ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta ", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nassarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"]
+
 
 const ApartmentForm = ({ property, id, ...rest }) => {
   const navigate = useNavigate();
@@ -53,7 +61,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
   }), [baseStyle, isDragActive, activeStyle, isDragAccept, acceptStyle, isDragReject, rejectStyle]);
 
   const thumbs = files.map((file, i) => (
-    <div style={thumb} key={file.name} onClick={()=>remove(i)}>
+    <div style={thumb} key={file.name} onClick={() => remove(i)}>
       <div style={thumbInner}>
         <img src={file.preview} alt={file.name} style={img} />
       </div>
@@ -153,7 +161,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
           }
         });
       } else {
-        if(files.length <= 0) {
+        if (files.length <= 0) {
           return setErrorMsg('image is required')
         }
 
@@ -171,13 +179,13 @@ const ApartmentForm = ({ property, id, ...rest }) => {
             const data = response.data;
             // const fileURL = data.secure_url 
             return data.url
-          }).catch((err)=> setErrorMsg(err))
+          }).catch((err) => setErrorMsg(err))
         })
-        
-        axios.all(uploads).then((res)=> {
-          const propertyData = {...values, img: res}
-          dispatch(createProperty(propertyData)).then((res)=> navigate('/app/apartments')).catch(err=> setErrorMsg(err))  
-        }).catch((err)=> setErrorMsg(err))
+
+        axios.all(uploads).then((res) => {
+          const propertyData = { ...values, img: res }
+          dispatch(createProperty(propertyData)).then((res) => navigate('/app/apartments')).catch(err => setErrorMsg(err))
+        }).catch((err) => setErrorMsg(err))
 
       }
 
@@ -211,9 +219,9 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                   <input {...getInputProps()} />
                   <p>Drag 'n' drop some files here, or click to select files</p>
                 </div>
-               { errorMsg && <p style={{color: 'red', paddingTop: '5px'}}>{errorMsg}</p>}
-                <aside 
-                style={thumbsContainer} >
+                {errorMsg && <p style={{ color: 'red', paddingTop: '5px' }}>{errorMsg}</p>}
+                <aside
+                  style={thumbsContainer} >
                   {thumbs}
                 </aside>
               </Box>
@@ -289,23 +297,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 error={Boolean(touched.address && errors.address)}
               />
             </Grid>
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="State"
-                name="state"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                required
-                value={values.state || ''}
-                variant="outlined"
-                error={Boolean(touched.state && errors.state)}
-              />
-            </Grid>
+
             <Grid
               item
               md={6}
@@ -340,7 +332,34 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 error={Boolean(touched.zipCode && errors.zipCode)}
               />
             </Grid>
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <FormControl variant="outlined" required fullWidth>
+                <InputLabel id="state">State</InputLabel>
+                <Select
+                  labelId="state"
+                  id="demo-simple-select-outlined"
+                  value={values.state || ''}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  label="State"
+                  error={Boolean(touched.state && errors.state)}
+                  disabled={!dropdownlist.length}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {dropdownlist.map((item)=> <MenuItem key={item} value={item}>
+          {item}
+          </MenuItem>)}
+                </Select>
+              </FormControl>
 
+
+            </Grid>
             <Grid
               item
               md={6}
@@ -508,7 +527,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
             variant="contained"
             onClick={handleSubmit}
           >
-            {id ?`${'Updat'}` : `${'Creat'}`}{loading ? 'ing' : 'e'} property
+            {id ? `${'Updat'}` : `${'Creat'}`}{loading ? 'ing' : 'e'} property
           </Button>
         </Box>
         {errorMsg && (<Typography
