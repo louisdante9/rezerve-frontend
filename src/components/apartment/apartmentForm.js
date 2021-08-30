@@ -397,6 +397,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               md={6}
               xs={12}
             >
+              check box and value here
               <TextField
                 fullWidth
                 label="Amenities"

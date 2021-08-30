@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import * as Yup from 'yup';
@@ -12,9 +14,12 @@ import {
   TextField,
   Typography
 } from '@material-ui/core';
+import {registerAdmin} from '../actions'
 
 const Register = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const [loading, setLoading] = useState(false);
 
   return (
     <>
@@ -34,22 +39,29 @@ const Register = () => {
           <Formik
             initialValues={{
               email: '',
-              firstName: '',
-              lastName: '',
+              firstname: '',
+              lastname: '',
               password: '',
+              confirmPass: '',
               policy: false
             }}
             validationSchema={
               Yup.object().shape({
                 email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-                firstName: Yup.string().max(255).required('First name is required'),
-                lastName: Yup.string().max(255).required('Last name is required'),
-                password: Yup.string().max(255).required('password is required'),
+                firstname: Yup.string().max(30).required('First name is required'),
+                lastname: Yup.string().max(30).required('Last name is required'),
+                password: Yup.string().max(40).required('password is required'),
+                confirmPass: Yup.string()
+                .test('passwords-match', 'Passwords must match', function(value){
+                  return this.parent.password === value
+                }),
                 policy: Yup.boolean().oneOf([true], 'This field must be checked')
               })
             }
-            onSubmit={() => {
-              navigate('/app/dashboard', { replace: true });
+            onSubmit={(values) => {
+              setLoading(!loading)
+              const {firstname, lastname, email, password} = values
+              dispatch(registerAdmin({firstname, lastname, email, password}, navigate))
             }}
           >
             {({
@@ -78,27 +90,27 @@ const Register = () => {
                   </Typography>
                 </Box>
                 <TextField
-                  error={Boolean(touched.firstName && errors.firstName)}
+                  error={Boolean(touched.firstname && errors.firstname)}
                   fullWidth
-                  helperText={touched.firstName && errors.firstName}
+                  helperText={touched.firstname && errors.firstname}
                   label="First name"
                   margin="normal"
-                  name="firstName"
+                  name="firstname"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.firstName}
+                  value={values.firstname}
                   variant="outlined"
                 />
                 <TextField
-                  error={Boolean(touched.lastName && errors.lastName)}
+                  error={Boolean(touched.lastname && errors.lastname)}
                   fullWidth
-                  helperText={touched.lastName && errors.lastName}
+                  helperText={touched.lastname && errors.lastname}
                   label="Last name"
                   margin="normal"
-                  name="lastName"
+                  name="lastname"
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  value={values.lastName}
+                  value={values.lastname}
                   variant="outlined"
                 />
                 <TextField
@@ -125,6 +137,19 @@ const Register = () => {
                   onChange={handleChange}
                   type="password"
                   value={values.password}
+                  variant="outlined"
+                />
+                <TextField
+                  error={Boolean(touched.confirmPass && errors.confirmPass)}
+                  fullWidth
+                  helperText={touched.confirmPass && errors.confirmPass}
+                  label="Confirm password"
+                  margin="normal"
+                  name="confirmPass"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="password"
+                  value={values.confirmPass}
                   variant="outlined"
                 />
                 <Box
@@ -169,8 +194,9 @@ const Register = () => {
                     size="large"
                     type="submit"
                     variant="contained"
+                    onClick={handleSubmit}
                   >
-                    Sign up now
+                    Sign{loading ? "ing" : ""} up now
                   </Button>
                 </Box>
                 <Typography

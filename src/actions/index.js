@@ -42,26 +42,6 @@ export function setCurrentUser(user) {
   };
 }
 
-/**
- *
- *
- * @desc this function signs in a user
- * @param {object} responseData
- * @returns {function}
- */
-const LoginError = data => ({ type: USER_LOGIN_ERRORS, payload: data });
-
-export function SigninRequest(userData, history) {
-  return dispatch => axios.post(`${API}/login`, userData)
-    .then(res => {
-      const token = registerToken(res.data);
-      dispatch(setCurrentUser(decode(token)));
-      history.push('/dashboard');
-      dispatch(LoginError({}));
-    }).catch(err => {
-      dispatch(LoginError(err.response.data));
-    })
-}
 
 /**
  *
@@ -77,49 +57,9 @@ function registerToken({ token }) {
   return token;
 }
 
-/**
- *
- *
- * @desc this method signs up a user
- * @param {object} userData
- * @param callback
- * @returns {function}
- */
-
-export const registerUser = (user, history) => dispatch => {
-  axios.post(`${API}/users/register`, user)
-    .then(res => {
-      history.push('/verifyToken')})
-    .catch(err => {
-      dispatch({
-        type: USER_SIGNUP_ERRORS,
-        payload: err.response.data
-      });
-    });
-}
 
 
 
-/**
- * 
- * 
- * @desc verifyUser
- * @param {any} userData 
- * @returns {void}
- */
-const verifyUserSuccess = token => ({ type: ACTIVATE_SUCCESS, token });
-export function verifyUser(activationCode, history) {
-  return dispatch => axios.patch(`${API}/users/activate`, activationCode).then(res => {
-    const token = registerToken(res.data.token);
-    dispatch(setCurrentUser(verifyUserSuccess(token)));
-    history.push('/dashboard')
-  }).catch(err => {
-    dispatch({
-      type: VERIFY_TOKEN_ERRORS,
-      payload: err.response.data
-    });
-  })
-}
 
 /**
  * 
@@ -214,7 +154,7 @@ export const getApartments = () => dispatch => {
  * @param {object} responseData
  * @returns {function}
  */
-const adminLoginError = data => ({ type: ADMIN_LOGIN_ERRORS, payload: data });
+const adminLoginError = data => ({ type: "AUTH_ERRORS", payload: data });
 
 export const adminLogin = (userData, navigate) => dispatch => {
   axios.post(`${API}/user/admin/login`, userData)
@@ -237,12 +177,14 @@ export const adminLogin = (userData, navigate) => dispatch => {
  * @returns {function}
  */
 
-export const registerAdmin = (admin, history) => dispatch => {
-  axios.post(`${API}/admin/register`, admin)
-    .then(() => history.push('/loginAdmin'))
+export const registerAdmin = (obj, navigate) => dispatch => {
+  console.log(obj, 'obj')
+  axios.post(`${API}/user/admin/register`, obj)
+    .then((res) => navigate('/login'))
     .catch(err => {
+      console.log(err)
       dispatch({
-        type: USER_SIGNUP_ERRORS,
+        type: "AUTH_ERRORS",
         payload: err.response.data
       });
     });

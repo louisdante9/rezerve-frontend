@@ -3,7 +3,8 @@ import * as types from '../actions/constants';
 
 export const initialState = {
   isAuthenticated: false,
-  user: {}
+  user: {},
+  errors: {}
 };
 
 const setCurrentUser = (state = initialState, action = {}) => {
@@ -13,8 +14,8 @@ const setCurrentUser = (state = initialState, action = {}) => {
 
       return { ...state, isAuthenticated: !isEmpty(action.user), user, role: user?.role };
     }
-    case types.ADMIN_LOGIN_ERRORS:
-      return action.payload;
+    case "AUTH_ERRORS":
+      return {errors: {...action.payload}};
     
     default: return state;
 
