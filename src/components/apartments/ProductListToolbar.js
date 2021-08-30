@@ -7,9 +7,13 @@ import {
   InputAdornment,
   SvgIcon
 } from '@material-ui/core';
-import { Search as SearchIcon } from 'react-feather';
 
-const ProductListToolbar = (props) => (
+import { Search as SearchIcon } from 'react-feather';
+import { useNavigate } from 'react-router-dom';
+
+const ProductListToolbar = (props) => {
+  const navigate = useNavigate();
+  return (
   <Box {...props}>
     <Box
       sx={{
@@ -17,17 +21,18 @@ const ProductListToolbar = (props) => (
         justifyContent: 'flex-end'
       }}
     >
-      <Button>
+      {/* <Button>
         Import
       </Button>
       <Button sx={{ mx: 1 }}>
         Export
-      </Button>
+      </Button> */}
       <Button
         color="primary"
         variant="contained"
+        onClick={()=> navigate('/app/apartment')}
       >
-        Add product
+        Add Property
       </Button>
     </Box>
     <Box sx={{ mt: 3 }}>
@@ -56,6 +61,6 @@ const ProductListToolbar = (props) => (
       </Card>
     </Box>
   </Box>
-);
+)};
 
 export default ProductListToolbar;

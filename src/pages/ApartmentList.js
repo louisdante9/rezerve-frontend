@@ -1,3 +1,5 @@
+import {useEffect} from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import {
   Box,
@@ -5,14 +7,21 @@ import {
   Grid,
   Pagination
 } from '@material-ui/core';
-import ProductListToolbar from 'src/components/product/ProductListToolbar';
-import ProductCard from 'src/components/product//ProductCard';
-import products from 'src/__mocks__/products';
+import ProductListToolbar from 'src/components/apartments/ProductListToolbar';
+import ProductCard from 'src/components/apartments/ProductCard';
+import {getApartments} from '../actions'
 
-const ProductList = () => (
+const ApartmemtList = () => {
+  const dispatch = useDispatch();
+  useEffect(()=> {
+    dispatch(getApartments());
+  }, []);
+  const { apartments } = useSelector((state)=> state.getApartments)
+
+  return (
   <>
     <Helmet>
-      <title>Products | Material Kit</title>
+      <title>Apartmemt | Rezerve Homes</title>
     </Helmet>
     <Box
       sx={{
@@ -28,15 +37,15 @@ const ProductList = () => (
             container
             spacing={3}
           >
-            {products.map((product) => (
+            {apartments.map((product) => (
               <Grid
                 item
-                key={product.id}
+                key={product._id}
                 lg={4}
                 md={6}
                 xs={12}
               >
-                <ProductCard product={product} />
+                <ProductCard property={product} />
               </Grid>
             ))}
           </Grid>
@@ -57,6 +66,6 @@ const ProductList = () => (
       </Container>
     </Box>
   </>
-);
+)};
 
-export default ProductList;
+export default ApartmemtList;
