@@ -57,3 +57,5 @@ export const acceptStyle = {
 export const rejectStyle = {
     borderColor: '#ff1744'
   };
+
+  

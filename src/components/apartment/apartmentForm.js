@@ -21,6 +21,7 @@ import {
   FormControl,
   InputLabel
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom'
 import { updateProperty, deleteProperty, createProperty } from '../../actions'
 import { thumbsContainer, thumb, thumbInner, img, baseStyle, activeStyle, acceptStyle, rejectStyle } from './styles'
@@ -29,7 +30,18 @@ import { thumbsContainer, thumb, thumbInner, img, baseStyle, activeStyle, accept
 const dropdownlist = ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta ", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nassarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"]
 
 
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    // margin: theme.spacing(1),
+    // minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+}));
+
 const ApartmentForm = ({ property, id, ...rest }) => {
+  const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false)
@@ -337,26 +349,42 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               md={6}
               xs={12}
             >
-              <FormControl variant="outlined"
-               fullWidth
-               required
+              <FormControl variant="outlined" fullWidth >
+                <InputLabel id="demo-simple-select-outlined-label">Age</InputLabel>
+                <Select
+                  labelId="state"
+                  id="state"
+                  value={values.state ||''}
+                  name="state"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={!dropdownlist.length}
+                  label="State"
+                >
+                  {dropdownlist.map((item) => <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>)}
+
+                </Select>
+              </FormControl>
+
+              {/* <Select
+                fullWidth
+                required
+                variant="outlined"
+                id="state"
+                value={values.state || "DEFAULT"}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={!dropdownlist.length}
               >
-                <InputLabel id="state">State</InputLabel>
-              <Select
-             
-        id="state"
-        label= "State"
-        value={values.state}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        name="state"
-        disabled={!dropdownlist.length}>
-          
-          {dropdownlist.map((item)=> <option key={item} value={item}>
-          {item}
-          </option>)}
-      </Select>
-      </FormControl>
+                <option disabled selected="All"> All</option>
+                {dropdownlist.map((item) => <option key={item} value={item}>
+                  {item}
+                </option>)}
+              </Select> */}
+
+
             </Grid>
             <Grid
               item
