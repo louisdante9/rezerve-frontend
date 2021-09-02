@@ -19,16 +19,15 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel
+  InputLabel,
+  Checkbox,
+  FormControlLabel
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom'
 import { updateProperty, deleteProperty, createProperty } from '../../actions'
 import { thumbsContainer, thumb, thumbInner, img, baseStyle, activeStyle, acceptStyle, rejectStyle } from './styles'
-
-
-const dropdownlist = ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta ", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nassarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"]
-
+import { stateList, amenities } from '../../utils';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -129,7 +128,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
       noOfRooms: property?.noOfRooms,
       noOfBaths: property?.noOfBaths,
       noOfguest: property?.noOfguest,
-      amenities: property?.amenities,
+       amenities: property?.amenities,
       agentDiscount: property?.agentDiscount,
       pricePerNight: property?.pricePerNight,
       latitude: property?.latitude,
@@ -150,12 +149,14 @@ const ApartmentForm = ({ property, id, ...rest }) => {
       noOfguest: Yup.number().required('No of guest per room is required'),
       amenities: Yup.string().required('Amenities is required'),
       agentDiscount: Yup.number().required('agent discount is required'),
+      pricePerNight: Yup.string().required('Price per night is required'),
       latitude: Yup.string().required('latitude is required'),
       longitude: Yup.string().required('longitude is required'),
     }),
 
     onSubmit: (values) => {
       setLoading(!loading)
+      console.log(values, 'values')
       if (id) {
         swal("Are you sure you want to update this?", {
           buttons: ["No!", "Yes!"],
@@ -265,6 +266,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               <TextField
                 fullWidth
                 label="Property Type"
+                helperText="Please specify the Property Type"
                 name="propertyType"
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -284,6 +286,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Description"
                 name="description"
+                helperText="Please enter a description"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -301,6 +304,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Address"
                 name="address"
+                helperText="Please specify an address"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -319,6 +323,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="City"
                 name="city"
+                helperText="Please specify City"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -336,6 +341,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Zip Code"
                 name="zipCode"
+                helperText="Please specify Zipcode"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -350,18 +356,18 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               xs={12}
             >
               <FormControl variant="outlined" fullWidth >
-                <InputLabel id="demo-simple-select-outlined-label">Age</InputLabel>
+                <InputLabel id="demo-simple-select-outlined-label">State</InputLabel>
                 <Select
                   labelId="state"
                   id="state"
-                  value={values.state ||''}
+                  value={values.state || ''}
                   name="state"
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  disabled={!dropdownlist.length}
+                  disabled={!stateList.length}
                   label="State"
                 >
-                  {dropdownlist.map((item) => <MenuItem key={item} value={item}>
+                  {stateList.map((item) => <MenuItem key={item} value={item}>
                     {item}
                   </MenuItem>)}
 
@@ -395,6 +401,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="No Of Rooms"
                 name="noOfRooms"
+                helperText="Please specify the number of rooms"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="number"
@@ -411,6 +418,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               <TextField
                 fullWidth
                 label="No Of Baths"
+                helperText="Please specify the number of baths"
                 name="noOfBaths"
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -429,6 +437,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="No Of Guest"
                 name="noOfguest"
+                helperText="Please specify the Property Name"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="number"
@@ -442,8 +451,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               md={6}
               xs={12}
             >
-              check box and value here
-              <TextField
+      <TextField
                 fullWidth
                 label="Amenities"
                 name="amenities"
@@ -452,9 +460,9 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 type="text"
                 value={values.amenities || ''}
                 variant="outlined"
+                placeholder= "eg Tv, Kitchen, Air-Conditioning"
                 error={Boolean(touched.amenities && errors.amenities)}
-              />
-            </Grid>
+              />            </Grid>
             <Grid
               item
               md={6}
@@ -464,6 +472,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Agent Discount"
                 name="agentDiscount"
+                helperText="Please specify the Agent's discount amount"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="number"
@@ -482,6 +491,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Price Per Night"
                 name="pricePerNight"
+                helperText="Please specify the price per night"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="text"
@@ -500,6 +510,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Latitude"
                 name="latitude"
+                helperText="Please specify the Latitude"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="text"
@@ -518,6 +529,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Longitude"
                 name="longitude"
+                helperText="Please specify the Longitude"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="text"
