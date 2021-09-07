@@ -24,7 +24,7 @@ const Account = () => {
   return (
   <>
     <Helmet>
-      <title>Account | Rezerve Homes</title>
+      <title>Account | Rezerve</title>
     </Helmet>
     <Box
       sx={{

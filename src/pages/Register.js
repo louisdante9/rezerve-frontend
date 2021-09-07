@@ -24,7 +24,7 @@ const Register = () => {
   return (
     <>
       <Helmet>
-        <title>Register | Material Kit</title>
+        <title>Register | Rezerve</title>
       </Helmet>
       <Box
         sx={{
