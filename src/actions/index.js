@@ -137,7 +137,7 @@ const getApartmentsError = data =>
 export const getApartments = () => dispatch => {
   axios.get(`${API}/apartment`)
     .then((response) => {
-      dispatch(getApartmentsSuccess(response.data.apartments));
+      dispatch(getApartmentsSuccess(response.data.apartments.listings));
     })
     .catch((error) => {
       console.log(error)

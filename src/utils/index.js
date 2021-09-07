@@ -1,0 +1,2 @@
+export const stateList = ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta ", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nassarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"]
+export const amenities = ['Kitchen', 'Pool', 'Doorman', 'TV', 'Wifi', 'Free Packing', 'Heating', 'Washing machine', 'Air conditioning', 'Hair dryer', 'Plate washer', 'Desk for work', 'Toileteries' ]

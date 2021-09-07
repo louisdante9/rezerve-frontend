@@ -15,13 +15,32 @@ import {
   Divider,
   Grid,
   TextField,
-  Typography
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Checkbox,
+  FormControlLabel
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom'
 import { updateProperty, deleteProperty, createProperty } from '../../actions'
-import {thumbsContainer, thumb, thumbInner, img, baseStyle, activeStyle, acceptStyle, rejectStyle } from './styles'
+import { thumbsContainer, thumb, thumbInner, img, baseStyle, activeStyle, acceptStyle, rejectStyle } from './styles'
+import { stateList, amenities } from '../../utils';
+
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    // margin: theme.spacing(1),
+    // minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
+}));
 
 const ApartmentForm = ({ property, id, ...rest }) => {
+  const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false)
@@ -53,7 +72,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
   }), [baseStyle, isDragActive, activeStyle, isDragAccept, acceptStyle, isDragReject, rejectStyle]);
 
   const thumbs = files.map((file, i) => (
-    <div style={thumb} key={file.name} onClick={()=>remove(i)}>
+    <div style={thumb} key={file.name} onClick={() => remove(i)}>
       <div style={thumbInner}>
         <img src={file.preview} alt={file.name} style={img} />
       </div>
@@ -109,7 +128,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
       noOfRooms: property?.noOfRooms,
       noOfBaths: property?.noOfBaths,
       noOfguest: property?.noOfguest,
-      amenities: property?.amenities,
+       amenities: property?.amenities,
       agentDiscount: property?.agentDiscount,
       pricePerNight: property?.pricePerNight,
       latitude: property?.latitude,
@@ -130,12 +149,14 @@ const ApartmentForm = ({ property, id, ...rest }) => {
       noOfguest: Yup.number().required('No of guest per room is required'),
       amenities: Yup.string().required('Amenities is required'),
       agentDiscount: Yup.number().required('agent discount is required'),
+      pricePerNight: Yup.string().required('Price per night is required'),
       latitude: Yup.string().required('latitude is required'),
       longitude: Yup.string().required('longitude is required'),
     }),
 
     onSubmit: (values) => {
       setLoading(!loading)
+      console.log(values, 'values')
       if (id) {
         swal("Are you sure you want to update this?", {
           buttons: ["No!", "Yes!"],
@@ -153,7 +174,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
           }
         });
       } else {
-        if(files.length <= 0) {
+        if (files.length <= 0) {
           return setErrorMsg('image is required')
         }
 
@@ -171,13 +192,13 @@ const ApartmentForm = ({ property, id, ...rest }) => {
             const data = response.data;
             // const fileURL = data.secure_url 
             return data.url
-          }).catch((err)=> setErrorMsg(err))
+          }).catch((err) => setErrorMsg(err))
         })
-        
-        axios.all(uploads).then((res)=> {
-          const propertyData = {...values, img: res}
-          dispatch(createProperty(propertyData)).then((res)=> navigate('/app/apartments')).catch(err=> setErrorMsg(err))  
-        }).catch((err)=> setErrorMsg(err))
+
+        axios.all(uploads).then((res) => {
+          const propertyData = { ...values, img: res }
+          dispatch(createProperty(propertyData)).then((res) => navigate('/app/apartments')).catch(err => setErrorMsg(err))
+        }).catch((err) => setErrorMsg(err))
 
       }
 
@@ -211,9 +232,9 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                   <input {...getInputProps()} />
                   <p>Drag 'n' drop some files here, or click to select files</p>
                 </div>
-               { errorMsg && <p style={{color: 'red', paddingTop: '5px'}}>{errorMsg}</p>}
-                <aside 
-                style={thumbsContainer} >
+                {errorMsg && <p style={{ color: 'red', paddingTop: '5px' }}>{errorMsg}</p>}
+                <aside
+                  style={thumbsContainer} >
                   {thumbs}
                 </aside>
               </Box>
@@ -245,6 +266,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               <TextField
                 fullWidth
                 label="Property Type"
+                helperText="Please specify the Property Type"
                 name="propertyType"
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -264,6 +286,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Description"
                 name="description"
+                helperText="Please enter a description"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -281,6 +304,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Address"
                 name="address"
+                helperText="Please specify an address"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -289,23 +313,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 error={Boolean(touched.address && errors.address)}
               />
             </Grid>
-            <Grid
-              item
-              md={6}
-              xs={12}
-            >
-              <TextField
-                fullWidth
-                label="State"
-                name="state"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                required
-                value={values.state || ''}
-                variant="outlined"
-                error={Boolean(touched.state && errors.state)}
-              />
-            </Grid>
+
             <Grid
               item
               md={6}
@@ -315,6 +323,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="City"
                 name="city"
+                helperText="Please specify City"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -330,8 +339,9 @@ const ApartmentForm = ({ property, id, ...rest }) => {
             >
               <TextField
                 fullWidth
-                label="zip Code"
+                label="Zip Code"
                 name="zipCode"
+                helperText="Please specify Zipcode"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -340,7 +350,48 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 error={Boolean(touched.zipCode && errors.zipCode)}
               />
             </Grid>
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <FormControl variant="outlined" fullWidth >
+                <InputLabel id="demo-simple-select-outlined-label">State</InputLabel>
+                <Select
+                  labelId="state"
+                  id="state"
+                  value={values.state || ''}
+                  name="state"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={!stateList.length}
+                  label="State"
+                >
+                  {stateList.map((item) => <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>)}
 
+                </Select>
+              </FormControl>
+
+              {/* <Select
+                fullWidth
+                required
+                variant="outlined"
+                id="state"
+                value={values.state || "DEFAULT"}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={!dropdownlist.length}
+              >
+                <option disabled selected="All"> All</option>
+                {dropdownlist.map((item) => <option key={item} value={item}>
+                  {item}
+                </option>)}
+              </Select> */}
+
+
+            </Grid>
             <Grid
               item
               md={6}
@@ -350,6 +401,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="No Of Rooms"
                 name="noOfRooms"
+                helperText="Please specify the number of rooms"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="number"
@@ -366,6 +418,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               <TextField
                 fullWidth
                 label="No Of Baths"
+                helperText="Please specify the number of baths"
                 name="noOfBaths"
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -384,6 +437,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="No Of Guest"
                 name="noOfguest"
+                helperText="Please specify the Property Name"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="number"
@@ -397,8 +451,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               md={6}
               xs={12}
             >
-              check box and value here
-              <TextField
+      <TextField
                 fullWidth
                 label="Amenities"
                 name="amenities"
@@ -407,9 +460,9 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 type="text"
                 value={values.amenities || ''}
                 variant="outlined"
+                placeholder= "eg Tv, Kitchen, Air-Conditioning"
                 error={Boolean(touched.amenities && errors.amenities)}
-              />
-            </Grid>
+              />            </Grid>
             <Grid
               item
               md={6}
@@ -419,6 +472,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Agent Discount"
                 name="agentDiscount"
+                helperText="Please specify the Agent's discount amount"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="number"
@@ -437,6 +491,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Price Per Night"
                 name="pricePerNight"
+                helperText="Please specify the price per night"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="text"
@@ -455,6 +510,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Latitude"
                 name="latitude"
+                helperText="Please specify the Latitude"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="text"
@@ -473,6 +529,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 fullWidth
                 label="Longitude"
                 name="longitude"
+                helperText="Please specify the Longitude"
                 onChange={handleChange}
                 onBlur={handleBlur}
                 type="text"
@@ -508,7 +565,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
             variant="contained"
             onClick={handleSubmit}
           >
-            {id ?`${'Updat'}` : `${'Creat'}`}{loading ? 'ing' : 'e'} property
+            {id ? `${'Updat'}` : `${'Creat'}`}{loading ? 'ing' : 'e'} property
           </Button>
         </Box>
         {errorMsg && (<Typography
