@@ -259,6 +259,7 @@ const fetchUsersError = data =>
 export const fetchUsers = () => dispatch => {
   axios.get(`${API}/user/admin/get-users`)
     .then((response) => {
+      console.log(response, 'response')
       dispatch(fetchUsersSuccess(response.data.clients));
     })
     .catch((error) => {
