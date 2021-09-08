@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -22,6 +22,8 @@ import {
   UserPlus as UserPlusIcon,
   Users as UsersIcon
 } from 'react-feather';
+import { logout } from '../actions'
+
 import NavItem from './NavItem';
 
 const userF = {
@@ -73,6 +75,7 @@ const items = [
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const {user} = useSelector(state=> state.setCurrentUser)
 
 
@@ -81,6 +84,10 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
       onMobileClose();
     }
   }, [location.pathname]);
+
+  const handleLogout = () => {
+    dispatch(logout())
+  }
 
   const content = (
     <Box
@@ -135,14 +142,14 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
         </List>
       </Box>
       <Box sx={{ flexGrow: 1 }} />
-      {/* <Box
+      <Box
         sx={{
           backgroundColor: 'background.default',
           m: 2,
           p: 2
         }}
       >
-        <Typography
+        {/* <Typography
           align="center"
           gutterBottom
           variant="h4"
@@ -154,7 +161,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           variant="body2"
         >
           Upgrade to PRO version and access 20 more screens
-        </Typography>
+        </Typography> */}
         <Box
           sx={{
             display: 'flex',
@@ -165,13 +172,13 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           <Button
             color="primary"
             component="a"
-            href="https://react-material-kit.devias.io"
             variant="contained"
+            onClick={handleLogout}
           >
-            See PRO version
+            Logout
           </Button>
         </Box>
-      </Box> */}
+      </Box>
     </Box>
   );
 

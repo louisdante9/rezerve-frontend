@@ -25,8 +25,8 @@ import {
   UPDATE_USER_SUCCESS,
 } from './constants';
 
-// const API = 'https://creditdeliveries.herokuapp.com';
-const API = 'http://localhost:9000';
+const API = 'https://rezerve.herokuapp.com';
+// const API = 'http://localhost:9000';
 
 /**
  *
@@ -180,7 +180,10 @@ export const adminLogin = (userData, navigate) => dispatch => {
 export const registerAdmin = (obj, navigate) => dispatch => {
   console.log(obj, 'obj')
   axios.post(`${API}/user/admin/register`, obj)
-    .then((res) => navigate('/login'))
+    .then((res) => {
+      console.log(res, 'res')
+      navigate('/login')
+    })
     .catch(err => {
       console.log(err)
       dispatch({
