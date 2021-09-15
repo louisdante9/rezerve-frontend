@@ -15,7 +15,6 @@ const CustomerList = () => {
   }, []);
   const { users } = useSelector((state)=> state.getUsers)
   const [userFilter, setUserFilter] = useState('user');
-  console.log(users, 'users')
   return (
   <>
     <Helmet>

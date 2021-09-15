@@ -25,8 +25,8 @@ import {
   UPDATE_USER_SUCCESS,
 } from './constants';
 
-const API = 'https://rezerve.herokuapp.com';
-// const API = 'http://localhost:9000';
+// const API = 'https://rezerve.herokuapp.com';
+const API = 'http://localhost:9000';
 
 /**
  *
@@ -56,10 +56,6 @@ function registerToken({ token }) {
   setAuthToken(token);
   return token;
 }
-
-
-
-
 
 /**
  * 

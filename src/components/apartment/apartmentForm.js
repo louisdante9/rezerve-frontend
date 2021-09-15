@@ -20,29 +20,33 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Checkbox,
-  FormControlLabel
 } from '@material-ui/core';
+import Geocode from "react-geocode";
 import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom'
 import { updateProperty, deleteProperty, createProperty } from '../../actions'
 import { thumbsContainer, thumb, thumbInner, img, baseStyle, activeStyle, acceptStyle, rejectStyle } from './styles'
-import { stateList, amenities } from '../../utils';
+import { stateList, propertyTypeList, amenities } from '../../utils';
 
 const useStyles = makeStyles((theme) => ({
-  formControl: {
-    // margin: theme.spacing(1),
-    // minWidth: 120,
-  },
+  formControl: {},
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
 }));
 
 const ApartmentForm = ({ property, id, ...rest }) => {
+  Geocode.setLanguage("en");
+  Geocode.setApiKey("AIzaSyD093gX7zynJ6NTLc5u0tassLDvgkgrUZo");
+  Geocode.setRegion("ng");
+  Geocode.setLocationType("ROOFTOP");
+
   const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [addr, setAddr] = useState('')
+  const [lng, setLng] = useState('')
+  const [lat, setLat] = useState('')
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [errorMsg, setErrorMsg] = useState('');
@@ -89,6 +93,21 @@ const ApartmentForm = ({ property, id, ...rest }) => {
     files.forEach(file => URL.revokeObjectURL(file.preview));
   }, [files]);
 
+  useEffect(() => {
+    if (addr) {
+      Geocode.fromAddress(addr).then(
+        (response) => {
+          const { lat, lng } = response.results[0].geometry.location;
+          setLat(lat)
+          setLng(lng)
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    }
+  }, [addr])
+
   const handelDelete = () => {
     setDeleting(!deleting)
     swal("Are you sure you want to delete this?", {
@@ -128,7 +147,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
       noOfRooms: property?.noOfRooms,
       noOfBaths: property?.noOfBaths,
       noOfguest: property?.noOfguest,
-       amenities: property?.amenities,
+      amenities: property?.amenities,
       agentDiscount: property?.agentDiscount,
       pricePerNight: property?.pricePerNight,
       latitude: property?.latitude,
@@ -150,61 +169,57 @@ const ApartmentForm = ({ property, id, ...rest }) => {
       amenities: Yup.string().required('Amenities is required'),
       agentDiscount: Yup.number().required('agent discount is required'),
       pricePerNight: Yup.string().required('Price per night is required'),
-      latitude: Yup.string().required('latitude is required'),
-      longitude: Yup.string().required('longitude is required'),
     }),
 
     onSubmit: (values) => {
-      setLoading(!loading)
-      console.log(values, 'values')
-      if (id) {
-        swal("Are you sure you want to update this?", {
-          buttons: ["No!", "Yes!"],
-        }).then((update) => {
-          if (update) {
-            dispatch(updateProperty(property._id, values)).then((response) => {
-              setLoading(!loading)
-              navigate('/app/apartments');
-            }).catch((err) => {
-              setLoading(!loading)
-              setErrorMsg('An error occurred!')
-            })
-          } else {
-            swal("No updates were made!");
+      console.log(values, lng, lat)
+        setLoading(!loading)
+        console.log(values, 'values')
+        if (id) {
+          swal("Are you sure you want to update this?", {
+            buttons: ["No!", "Yes!"],
+          }).then((update) => {
+            if (update) {
+              dispatch(updateProperty(property._id, values)).then((response) => {
+                setLoading(!loading)
+                navigate('/app/apartments');
+              }).catch((err) => {
+                setLoading(!loading)
+                setErrorMsg('An error occurred!')
+              })
+            } else {
+              swal("No updates were made!");
+            }
+          });
+        } else {
+          if (files.length <= 0) {
+            return setErrorMsg('image is required')
           }
-        });
-      } else {
-        if (files.length <= 0) {
-          return setErrorMsg('image is required')
-        }
 
-        const uploadURL = 'https://api.cloudinary.com/v1_1/drhvgijzb/image/upload';
-        const uploadPreset = 'st4gan5t';
-        const uploads = files.map(file => {
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("upload_preset", uploadPreset);
-          formData.append("timestamp", (Date.now() / 1000) | 0);
-          delete axios.defaults.headers.common['x-access-token'];
-          return axios.post(uploadURL, formData, {
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          }).then(response => {
-            const data = response.data;
-            // const fileURL = data.secure_url 
-            return data.url
+          const uploadURL = 'https://api.cloudinary.com/v1_1/drhvgijzb/image/upload';
+          const uploadPreset = 'st4gan5t';
+          const uploads = files.map(file => {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", uploadPreset);
+            formData.append("timestamp", (Date.now() / 1000) | 0);
+            delete axios.defaults.headers.common['x-access-token'];
+            return axios.post(uploadURL, formData, {
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            }).then(response => {
+              const data = response.data;
+              // const fileURL = data.secure_url 
+              return data.url
+            }).catch((err) => setErrorMsg(err))
+          })
+
+          axios.all(uploads).then((res) => {
+            const propertyData = { ...values, img: res, latitude: lat, longitude: lng }
+            dispatch(createProperty(propertyData)).then((res) => navigate('/app/apartments')).catch(err => setErrorMsg(err))
           }).catch((err) => setErrorMsg(err))
-        })
-
-        axios.all(uploads).then((res) => {
-          const propertyData = { ...values, img: res }
-          dispatch(createProperty(propertyData)).then((res) => navigate('/app/apartments')).catch(err => setErrorMsg(err))
-        }).catch((err) => setErrorMsg(err))
-
-      }
-
+        }
     },
   });
-
   return (
     <form
       autoComplete="off"
@@ -213,8 +228,8 @@ const ApartmentForm = ({ property, id, ...rest }) => {
     >
       <Card>
         <CardHeader
-          subheader="The information can be edited"
-          title="Property Detail"
+          subheader={`${id === undefined}` ? "" : "The information can be edited"}
+          title="Listing Submission"
         />
         <Divider />
         <CardContent>
@@ -263,30 +278,38 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               md={6}
               xs={12}
             >
-              <TextField
-                fullWidth
-                label="Property Type"
-                helperText="Please specify the Property Type"
-                name="propertyType"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                required
-                value={values.propertyType || ''}
-                variant="outlined"
-                error={Boolean(touched.propertyType && errors.propertyType)}
+              <FormControl variant="outlined" fullWidth >
+                <InputLabel id="propertyType">Property Type</InputLabel>
+                <Select
+                  labelId="propertyType"
+                  id="propertyType"
+                  value={values.propertyType || ''}
+                  name="propertyType"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={!propertyTypeList.length}
+                  label="propertyType"
+                >
+                  {propertyTypeList.map((item) => <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>)}
 
-              />
+                </Select>
+              </FormControl>
             </Grid>
             <Grid
               item
-              md={6}
+              md={12}
               xs={12}
             >
               <TextField
                 fullWidth
                 label="Description"
                 name="description"
+                placeholder="Placeholder"
                 helperText="Please enter a description"
+                multiline
+                rows={9}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 required
@@ -305,7 +328,10 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 label="Address"
                 name="address"
                 helperText="Please specify an address"
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e)
+                  setAddr(e.target.value)
+                }}
                 onBlur={handleBlur}
                 required
                 value={values.address || ''}
@@ -373,24 +399,6 @@ const ApartmentForm = ({ property, id, ...rest }) => {
 
                 </Select>
               </FormControl>
-
-              {/* <Select
-                fullWidth
-                required
-                variant="outlined"
-                id="state"
-                value={values.state || "DEFAULT"}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={!dropdownlist.length}
-              >
-                <option disabled selected="All"> All</option>
-                {dropdownlist.map((item) => <option key={item} value={item}>
-                  {item}
-                </option>)}
-              </Select> */}
-
-
             </Grid>
             <Grid
               item
@@ -451,7 +459,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
               md={6}
               xs={12}
             >
-      <TextField
+              <TextField
                 fullWidth
                 label="Amenities"
                 name="amenities"
@@ -460,7 +468,7 @@ const ApartmentForm = ({ property, id, ...rest }) => {
                 type="text"
                 value={values.amenities || ''}
                 variant="outlined"
-                placeholder= "eg Tv, Kitchen, Air-Conditioning"
+                placeholder="eg Tv, Kitchen, Air-Conditioning"
                 error={Boolean(touched.amenities && errors.amenities)}
               />            </Grid>
             <Grid
